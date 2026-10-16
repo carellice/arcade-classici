@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,7 +76,8 @@ fun InvadersScreen(onExit: () -> Unit) {
     val accent = Neon.Purple
     var showTutorial by remember { mutableStateOf(!prefs.tutorialSeen("invaders")) }
     var best by remember { mutableStateOf(prefs.best(BEST_KEY)) }
-    var newRecord by remember { mutableStateOf(false) }
+    // Record a inizio partita: il punteggio viene salvato anche a metà, così il confronto resta corretto
+    var startBest by remember { mutableStateOf(best) }
 
     Box(Modifier.fillMaxSize()) {
         BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
@@ -87,18 +89,24 @@ fun InvadersScreen(onExit: () -> Unit) {
             val fg by AppState.foreground
             LaunchedEffect(fg) { if (!fg) game.pause() }
             GameLoop { dt -> game.update(dt, frozen = showTutorial) }
-            LaunchedEffect(game.phase) {
-                if (game.phase == IPhase.OVER) {
-                    newRecord = prefs.submitHigh(BEST_KEY, game.score)
-                    best = prefs.best(BEST_KEY)
-                }
+            // Il record si salva a fine partita ma anche in pausa, a fine livello e all'uscita,
+            // così non si perde abbandonando una partita lunga
+            val saveScore = {
+                prefs.submitHigh(BEST_KEY, game.score)
+                best = prefs.best(BEST_KEY)
             }
-            BackHandler { if (game.phase == IPhase.PLAYING) game.pause() else onExit() }
+            val restart = { saveScore(); startBest = best; game.restart() }
+            val exit = { saveScore(); onExit() }
+            LaunchedEffect(game.phase) {
+                if (game.phase == IPhase.OVER || game.phase == IPhase.PAUSED || game.phase == IPhase.WAVE_CLEAR) saveScore()
+            }
+            DisposableEffect(game) { onDispose { saveScore() } }
+            BackHandler { if (game.phase == IPhase.PLAYING) game.pause() else exit() }
 
             Column(Modifier.fillMaxSize()) {
                 GameTopBar(
                     accent = accent,
-                    onBack = onExit,
+                    onBack = exit,
                     onHelp = { game.pause(); showTutorial = true },
                     onPause = { game.pause() },
                 ) {
@@ -120,20 +128,20 @@ fun InvadersScreen(onExit: () -> Unit) {
                 visible = game.phase == IPhase.PAUSED && !showTutorial,
                 accent = accent,
                 title = "PAUSA",
-                lines = listOf("Punti" to game.score.toString(), "Ondata" to game.wave.toString()),
+                lines = listOf("Punti" to game.score.toString(), "Ondata" to game.wave.toString(), "Record" to best.toString()),
                 highlight = null,
                 primary = "Riprendi" to { game.resume() },
-                tertiary = "Ricomincia" to { newRecord = false; game.restart() },
-                secondary = "Menu" to onExit,
+                tertiary = "Ricomincia" to restart,
+                secondary = "Menu" to exit,
             )
             ResultPanel(
                 visible = game.showResult,
                 accent = Neon.Pink,
                 title = if (game.invaded) "INVASIONE!" else "GAME OVER",
                 lines = listOf("Punti" to game.score.toString(), "Ondata" to game.wave.toString(), "Record" to best.toString()),
-                highlight = if (newRecord) "★ NUOVO RECORD! ★" else if (game.invaded) "Gli alieni sono atterrati" else null,
-                primary = "Riprova" to { newRecord = false; game.restart() },
-                secondary = "Menu" to onExit,
+                highlight = if (game.score > startBest) "★ NUOVO RECORD! ★" else if (game.invaded) "Gli alieni sono atterrati" else null,
+                primary = "Riprova" to restart,
+                secondary = "Menu" to exit,
             )
             TutorialOverlay(
                 visible = showTutorial,
