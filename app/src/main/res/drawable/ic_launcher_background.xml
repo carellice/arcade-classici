@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+
+    <!-- Cielo e terreno -->
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="54" android:startY="0" android:endX="54" android:endY="108">
+                <item android:offset="0" android:color="#FF0A0626" />
+                <item android:offset="0.45" android:color="#FF2A0B58" />
+                <item android:offset="0.62" android:color="#FF4A1270" />
+                <item android:offset="0.62" android:color="#FF13062B" />
+                <item android:offset="1" android:color="#FF06030F" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Stelle -->
+    <path android:fillColor="#CCFFFFFF"
+        android:pathData="M18,16m-0.9,0a0.9,0.9 0,1 1,1.8 0a0.9,0.9 0,1 1,-1.8 0 M88,22m-0.7,0a0.7,0.7 0,1 1,1.4 0a0.7,0.7 0,1 1,-1.4 0 M30,30m-0.6,0a0.6,0.6 0,1 1,1.2 0a0.6,0.6 0,1 1,-1.2 0 M78,12m-0.8,0a0.8,0.8 0,1 1,1.6 0a0.8,0.8 0,1 1,-1.6 0 M94,40m-0.6,0a0.6,0.6 0,1 1,1.2 0a0.6,0.6 0,1 1,-1.2 0 M12,44m-0.7,0a0.7,0.7 0,1 1,1.4 0a0.7,0.7 0,1 1,-1.4 0" />
+
+    <!-- Alone del sole -->
+    <path android:pathData="M54,67m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="54" android:centerY="58" android:gradientRadius="40">
+                <item android:offset="0" android:color="#66FF3EA5" />
+                <item android:offset="1" android:color="#00FF3EA5" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Sole (metà sopra l'orizzonte) -->
+    <path android:pathData="M25,67 A29,29 0 0,1 83,67 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="54" android:startY="38" android:endX="54" android:endY="67">
+                <item android:offset="0" android:color="#FFFFE96A" />
+                <item android:offset="0.5" android:color="#FFFF8A3D" />
+                <item android:offset="1" android:color="#FFFF3EA5" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Strisce del sole -->
+    <path android:fillColor="#FF3F0F68" android:pathData="M20,53.5h68v1.6h-68z M20,57.8h68v2.2h-68z M20,62.2h68v2.9h-68z" />
+
+    <!-- Orizzonte -->
+    <path android:fillColor="#FF22F2FF" android:pathData="M0,66.6h108v1.2h-108z" />
+
+    <!-- Griglia in prospettiva -->
+    <path android:strokeColor="#AAFF3EA5" android:strokeWidth="0.9"
+        android:pathData="M0,71h108 M0,77h108 M0,86h108 M0,99h108
+            M54,67L54,108 M54,67L72,108 M54,67L36,108 M54,67L92,108 M54,67L16,108 M54,67L116,108 M54,67L-8,108" />
+</vector>
