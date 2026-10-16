@@ -69,12 +69,14 @@ import com.giochiclassici.arcade.ui.Surface3D
 import com.giochiclassici.arcade.ui.drawRaised
 import com.giochiclassici.arcade.ui.recessed
 import com.giochiclassici.arcade.ui.Neon
+import com.giochiclassici.arcade.ui.NeonIcons.gear
 import com.giochiclassici.arcade.ui.NeonIcons.music
 import com.giochiclassici.arcade.ui.NeonIcons.sound
 import com.giochiclassici.arcade.ui.NeonIcons.vibrate
 import com.giochiclassici.arcade.ui.NeonText
 import com.giochiclassici.arcade.ui.SynthwaveBackground
 import com.giochiclassici.arcade.ui.formatTime
+import com.giochiclassici.arcade.update.Updater
 import com.giochiclassici.arcade.ui.pressable
 import com.giochiclassici.arcade.ui.rememberTime
 import kotlin.math.abs
@@ -88,7 +90,7 @@ enum class GameId(val title: String, val tagline: String, val color: Color) {
 }
 
 @Composable
-fun MenuScreen(onPlay: (GameId) -> Unit) {
+fun MenuScreen(onPlay: (GameId) -> Unit, onSettings: () -> Unit) {
     val prefs = Services.prefs
     val time by rememberTime()
     Box(Modifier.fillMaxSize()) {
@@ -105,6 +107,7 @@ fun MenuScreen(onPlay: (GameId) -> Unit) {
                 NeonText("ARCADE", Neon.Pink, 54.sp, letterSpacing = 6.sp, glow = 40f)
                 NeonText("CLASSICI", Neon.Cyan, 24.sp, letterSpacing = 12.sp, glow = 24f)
             }
+            Updater.availableVersion?.let { v -> UpdateBanner(v, onSettings) }
             Spacer(Modifier.height(10.dp))
             Column(
                 Modifier.weight(1f).widthIn(max = 500.dp).verticalScroll(rememberScrollState())
@@ -125,14 +128,37 @@ fun MenuScreen(onPlay: (GameId) -> Unit) {
             }
             Row(
                 Modifier.padding(top = 6.dp, bottom = 14.dp),
-                horizontalArrangement = Arrangement.spacedBy(22.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SettingToggle("Musica", prefs.music, { prefs.toggleMusic() }) { c -> music(c, prefs.music) }
                 SettingToggle("Effetti", prefs.sfx, { prefs.toggleSfx() }) { c -> sound(c, prefs.sfx) }
                 SettingToggle("Vibrazione", prefs.haptics, { prefs.toggleHaptics() }) { c -> vibrate(c, prefs.haptics) }
+                Box {
+                    SettingToggle("Impostazioni", true, onSettings) { c -> gear(c) }
+                    if (Updater.availableVersion != null) {
+                        Box(
+                            Modifier.align(Alignment.TopEnd).padding(end = 6.dp).size(14.dp)
+                                .drawBehind {
+                                    drawCircle(Neon.Bg0, size.minDimension / 2 + 2.dp.toPx())
+                                    drawCircle(Neon.Yellow, size.minDimension / 2)
+                                },
+                        )
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun UpdateBanner(version: String, onClick: () -> Unit) {
+    Raised(Surface3D.solid(Neon.Yellow), Modifier.padding(top = 10.dp), corner = 18.dp, depth = 4.dp, onClick = onClick) {
+        Text(
+            "★ NUOVA VERSIONE $version DISPONIBILE",
+            color = Neon.Bg0, fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 1.sp,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        )
     }
 }
 

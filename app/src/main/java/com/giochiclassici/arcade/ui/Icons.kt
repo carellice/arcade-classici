@@ -114,4 +114,16 @@ object NeonIcons {
         drawRoundRect(c, Offset(w * 0.12f, h * 0.12f), Size(w * 0.76f, h * 0.76f), CornerRadius(w * 0.16f), style = Stroke(sw()))
         drawCircle(c, w * 0.14f, Offset(w * 0.5f, h * 0.5f))
     }
+
+    fun DrawScope.gear(c: Color) {
+        val w = size.width; val h = size.height
+        val center = Offset(w / 2, h / 2)
+        for (k in 0 until 8) {
+            val a = k * Math.PI.toFloat() / 4f
+            val dir = Offset(kotlin.math.cos(a), kotlin.math.sin(a))
+            drawLine(c, center + dir * (w * 0.28f), center + dir * (w * 0.46f), w * 0.16f, StrokeCap.Round)
+        }
+        drawCircle(c, w * 0.33f, center)
+        drawCircle(Neon.Bg0, w * 0.13f, center)
+    }
 }

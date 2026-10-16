@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -24,37 +25,46 @@ import com.giochiclassici.arcade.games.mines.MinesScreen
 import com.giochiclassici.arcade.games.snake.SnakeScreen
 import com.giochiclassici.arcade.menu.GameId
 import com.giochiclassici.arcade.menu.MenuScreen
+import com.giochiclassici.arcade.menu.SettingsScreen
+import com.giochiclassici.arcade.update.Updater
 import com.giochiclassici.arcade.ui.Neon
+
+private const val MENU = "menu"
+private const val SETTINGS = "settings"
 
 @Composable
 fun ArcadeApp() {
-    var current by rememberSaveable { mutableStateOf<GameId?>(null) }
-    LaunchedEffect(current) {
+    // Schermata corrente: menu, impostazioni o il nome di un gioco
+    var route by rememberSaveable { mutableStateOf(MENU) }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(Unit) { Updater.checkOnStartup(scope) }
+    LaunchedEffect(route) {
         Audio.music(
-            when (current) {
-                null -> Songs.menu
-                GameId.SNAKE -> Songs.snake
-                GameId.MINES -> Songs.mines
-                GameId.BREAKOUT -> Songs.breakout
-                GameId.INVADERS -> Songs.invaders
+            when (route) {
+                GameId.SNAKE.name -> Songs.snake
+                GameId.MINES.name -> Songs.mines
+                GameId.BREAKOUT.name -> Songs.breakout
+                GameId.INVADERS.name -> Songs.invaders
+                else -> Songs.menu
             }
         )
     }
     Box(Modifier.fillMaxSize().background(Neon.Bg0)) {
         AnimatedContent(
-            targetState = current,
+            targetState = route,
             transitionSpec = {
                 (fadeIn(tween(350)) + scaleIn(tween(350), initialScale = 0.94f)) togetherWith fadeOut(tween(220))
             },
             label = "screen",
-        ) { g ->
-            val exit = { current = null }
-            when (g) {
-                null -> MenuScreen(onPlay = { current = it })
-                GameId.SNAKE -> SnakeScreen(onExit = exit)
-                GameId.MINES -> MinesScreen(onExit = exit)
-                GameId.BREAKOUT -> BreakoutScreen(onExit = exit)
-                GameId.INVADERS -> InvadersScreen(onExit = exit)
+        ) { r ->
+            val exit = { route = MENU }
+            when (r) {
+                MENU -> MenuScreen(onPlay = { route = it.name }, onSettings = { route = SETTINGS })
+                SETTINGS -> SettingsScreen(onBack = exit)
+                GameId.SNAKE.name -> SnakeScreen(onExit = exit)
+                GameId.MINES.name -> MinesScreen(onExit = exit)
+                GameId.BREAKOUT.name -> BreakoutScreen(onExit = exit)
+                GameId.INVADERS.name -> InvadersScreen(onExit = exit)
             }
         }
     }
