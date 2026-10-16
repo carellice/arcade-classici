@@ -6,6 +6,11 @@
 
 <p align="center"><a href="../../releases/latest"><b>⬇ Scarica l'ultima versione (APK)</b></a></p>
 
+<p align="center">
+  <a href="docs/trailer.mp4"><img src="docs/trailer-poster.jpg" width="720" alt="Guarda il video di presentazione"></a><br>
+  <sub>▶ Guarda il video di presentazione (53 s, musica originale)</sub>
+</p>
+
 ## Giochi
 - **Snake** – movimento fluido, bordi attraversabili, stella bonus
 - **Campo Minato** – tre difficoltà, prima mossa sicura, apertura rapida sui numeri
