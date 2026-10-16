@@ -109,6 +109,7 @@ enum class Sfx {
     Click, Start, Eat, Bonus, Die, Reveal, Flag, Unflag, Boom, Win,
     Paddle, Brick, BrickHard, Wall, PowerUp, LifeLost, LevelClear,
     Laser, Invader, March, Ufo, ShieldHit,
+    Move, Rotate, Lock, Line, Tetris,
 }
 
 internal object SfxLib {
@@ -171,6 +172,21 @@ internal object SfxLib {
             Sfx.LevelClear -> mix(
                 arp(listOf("C5", "D5", "E5", "G5", "A5", "C6"), 0.06f, Wave.SQUARE, 0.25f, 0.3f, last = 0.5f),
                 delay(tone(0.6f, Wave.TRIANGLE, Notes.freq("C4"), vol = 0.35f), 0.3f),
+            )
+            Sfx.Move -> tone(0.03f, Wave.SQUARE, 620f, 560f, duty = 0.25f, vol = 0.18f)
+            Sfx.Rotate -> tone(0.06f, Wave.SQUARE, 700f, 1150f, duty = 0.25f, vol = 0.22f, curve = 1f)
+            Sfx.Lock -> mix(
+                tone(0.08f, Wave.TRIANGLE, 180f, 110f, vol = 0.5f),
+                tone(0.04f, Wave.NOISE, 2500f, 800f, vol = 0.15f),
+            )
+            Sfx.Line -> mix(
+                arp(listOf("G5", "C6", "E6"), 0.05f, Wave.SQUARE, 0.25f, 0.28f, last = 0.18f),
+                tone(0.3f, Wave.NOISE, 6000f, 1200f, vol = 0.14f, curve = 2f),
+            )
+            Sfx.Tetris -> mix(
+                arp(listOf("C5", "E5", "G5", "C6", "E6", "G6", "C7"), 0.05f, Wave.SQUARE, 0.25f, 0.3f, last = 0.4f),
+                delay(arp(listOf("C4", "G4", "C5"), 0.1f, Wave.TRIANGLE, 0.5f, 0.35f, last = 0.3f), 0.05f),
+                tone(0.5f, Wave.NOISE, 5000f, 600f, vol = 0.18f, curve = 2f),
             )
         }
     }

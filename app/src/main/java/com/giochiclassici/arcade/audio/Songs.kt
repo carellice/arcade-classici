@@ -69,6 +69,18 @@ object Songs {
         )
     }
 
+    val blocks: Song by lazy {
+        build(
+            bpm = 138,
+            chords = "Am Em F G Am Em Dm E",
+            lead = """
+                A5 - E5 - A5 B5 C6 - | B5 - G5 - E5 - G5 - | A5 - F5 - C5 - F5 A5 | G5 - - D5 B4 - D5 -
+                E5 - A5 - C6 - B5 A5 | G5 - E5 - B4 - E5 G5 | F5 - A5 - D6 - C6 A5 | B5 - - - G#5 - E5 -
+            """,
+            drums = "k h s h k k s h",
+        )
+    }
+
     private fun parse(s: String): IntArray =
         s.split(' ', '|', '\n', '\t').filter { it.isNotBlank() }.map {
             when (it) {

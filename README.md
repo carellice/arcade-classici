@@ -2,7 +2,7 @@
 
 <h1 align="center">Arcade Classici</h1>
 
-<p align="center">Quattro giochi classici rivisitati in chiave neon/synthwave e 3D, per Android.</p>
+<p align="center">Cinque giochi classici rivisitati in chiave neon/synthwave e 3D, per Android.</p>
 
 <p align="center"><a href="../../releases/latest"><b>⬇ Scarica l'ultima versione (APK)</b></a></p>
 
@@ -16,6 +16,7 @@
 - **Campo Minato** – tre difficoltà, prima mossa sicura, apertura rapida sui numeri
 - **Breakout** – sei livelli, mattoni resistenti e d'acciaio, potenziamenti e combo
 - **Invasori** – in stile Space Invaders: alieni voxel, scudi distruttibili, UFO e potenziamenti
+- **Blocchi** – in stile Tetris: rotazione con un tocco, caduta istantanea, ombra di atterraggio e livelli sempre più veloci
 
 Ogni gioco ha un tutorial illustrato, musica propria ed effetti sonori sintetizzati in tempo reale.
 L'app si aggiorna da sola: in **Impostazioni → Aggiornamenti** controlla l'ultima release di questo repository.

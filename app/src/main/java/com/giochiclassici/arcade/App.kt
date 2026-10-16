@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.giochiclassici.arcade.audio.Audio
 import com.giochiclassici.arcade.audio.Songs
+import com.giochiclassici.arcade.games.blocks.BlocksScreen
 import com.giochiclassici.arcade.games.breakout.BreakoutScreen
 import com.giochiclassici.arcade.games.invaders.InvadersScreen
 import com.giochiclassici.arcade.games.mines.MinesScreen
@@ -45,6 +46,7 @@ fun ArcadeApp() {
                 GameId.MINES.name -> Songs.mines
                 GameId.BREAKOUT.name -> Songs.breakout
                 GameId.INVADERS.name -> Songs.invaders
+                GameId.BLOCKS.name -> Songs.blocks
                 else -> Songs.menu
             }
         )
@@ -65,6 +67,7 @@ fun ArcadeApp() {
                 GameId.MINES.name -> MinesScreen(onExit = exit)
                 GameId.BREAKOUT.name -> BreakoutScreen(onExit = exit)
                 GameId.INVADERS.name -> InvadersScreen(onExit = exit)
+                GameId.BLOCKS.name -> BlocksScreen(onExit = exit)
             }
         }
     }

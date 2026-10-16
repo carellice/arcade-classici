@@ -49,6 +49,8 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giochiclassici.arcade.core.Services
+import com.giochiclassici.arcade.games.blocks.Piece
+import com.giochiclassici.arcade.games.blocks.drawBlock
 import com.giochiclassici.arcade.games.breakout.Brick
 import com.giochiclassici.arcade.games.invaders.SHIP
 import com.giochiclassici.arcade.games.invaders.SPRITES
@@ -87,6 +89,7 @@ enum class GameId(val title: String, val tagline: String, val color: Color) {
     MINES("CAMPO MINATO", "Logica esplosiva", Neon.Cyan),
     BREAKOUT("BREAKOUT", "Distruggi ogni mattone", Neon.Pink),
     INVADERS("INVASORI", "Difendi la Terra dagli alieni", Neon.Purple),
+    BLOCKS("BLOCCHI", "Incastra i pezzi, cancella le righe", Neon.Orange),
 }
 
 @Composable
@@ -119,6 +122,7 @@ fun MenuScreen(onPlay: (GameId) -> Unit, onSettings: () -> Unit) {
                         GameId.SNAKE -> prefs.best("best_snake").takeIf { it > 0 }?.let { "Record: $it" }
                         GameId.BREAKOUT -> prefs.best("best_breakout").takeIf { it > 0 }?.let { "Record: $it" }
                         GameId.INVADERS -> prefs.best("best_invaders").takeIf { it > 0 }?.let { "Record: $it" }
+                        GameId.BLOCKS -> prefs.best("best_blocks").takeIf { it > 0 }?.let { "Record: $it" }
                         GameId.MINES -> MineDiff.entries.reversed().firstNotNullOfOrNull { d ->
                             prefs.best(d.bestKey).takeIf { it > 0 }?.let { "Record ${d.label}: ${formatTime(it)}" }
                         }
@@ -289,6 +293,17 @@ private fun GamePreview(game: GameId) {
                 val by = size.height * (0.8f - ((t * 1.3f) % 1f) * 0.45f)
                 drawLine(Neon.Cyan, Offset(shipX, by), Offset(shipX, by + p * 3f), p * 0.9f)
                 drawSprite(SHIP, 0, Offset(shipX - SHIP.w * p / 2, size.height * 0.82f), p, glow = false)
+            }
+            GameId.BLOCKS -> {
+                val c = size.width / 6f
+                // Fondo con un buco: il pezzo cade, lo riempie e la riga si accende
+                val p = (t * 0.6f) % 1f
+                val colors = listOf(Neon.Cyan, Neon.Pink, Neon.Yellow, Neon.Green, Neon.Purple, Neon.Teal)
+                val flash = if (p > 0.7f) 1f - (p - 0.7f) / 0.3f else 0f
+                for (x in 0 until 6) if (x != 2) drawBlock(Offset(x * c, 5 * c), c, colors[x], flash = flash)
+                for (x in listOf(0, 4, 5)) drawBlock(Offset(x * c, 4 * c), c, colors[5 - x], flash = flash)
+                val y = (-3f + minOf(p / 0.7f, 1f) * 6f) * c
+                for ((x, yy) in Piece.T.shape(2)) drawBlock(Offset((1 + x) * c, y + yy * c), c, Piece.T.color)
             }
             GameId.BREAKOUT -> {
                 val s = size.width / 100f
