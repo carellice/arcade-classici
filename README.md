@@ -48,6 +48,9 @@ scripts/release.sh            # incrementa la patch (1.0.0 → 1.0.1)
 scripts/release.sh minor      # 1.0.1 → 1.1.0
 scripts/release.sh 2.0.0      # versione esplicita
 ```
+Su Windows: doppio clic su `release.cmd` (chiede il tipo di release) oppure, da terminale,
+`release.cmd minor` / `scripts\release.ps1 2.0.0`.
+
 Lo script aggiorna la versione, compila l'APK firmato, crea il commit e il tag, pubblica la nuova release
 su GitHub con l'APK allegato ed elimina le release precedenti.
 
