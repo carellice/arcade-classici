@@ -172,8 +172,9 @@ fun BlocksScreen(onExit: () -> Unit) {
 }
 
 /**
- * Comandi a gesti: tocco = ruota, trascina di lato = sposta, trascina in giù = discesa veloce.
- * La caduta immediata ha un tasto dedicato, così non scatta per errore.
+ * Comandi a gesti: tocco = ruota, trascina di lato = sposta.
+ * Il movimento verticale del dito viene ignorato: far precipitare il pezzo
+ * è possibile solo con il tasto CADUTA, così non succede per errore.
  */
 private fun Modifier.blocksControls(game: BlocksGame, cell: Float): Modifier = pointerInput(game, cell) {
     val slop = 10.dp.toPx()
@@ -182,14 +183,11 @@ private fun Modifier.blocksControls(game: BlocksGame, cell: Float): Modifier = p
         val down = awaitFirstDown(requireUnconsumed = true)
         val t0 = down.uptimeMillis
         var anchorX = down.position.x
-        var anchorY = down.position.y
         var moved = false
-        var dropping = false
         while (true) {
             val ch = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
             val total = ch.position - down.position
             if (!ch.pressed) {
-                game.setSoftDrop(false)
                 val dt = ch.uptimeMillis - t0
                 when {
                     game.phase == BlPhase.READY -> game.start()
@@ -199,15 +197,8 @@ private fun Modifier.blocksControls(game: BlocksGame, cell: Float): Modifier = p
             }
             if (abs(total.x) > slop || abs(total.y) > slop) moved = true
             // Spostamento orizzontale: un passo per ogni cella percorsa dal dito
-            if (!dropping) {
-                while (ch.position.x - anchorX > cell * 0.9f) { game.move(1); anchorX += cell * 0.9f }
-                while (anchorX - ch.position.x > cell * 0.9f) { game.move(-1); anchorX -= cell * 0.9f }
-            }
-            // Discesa veloce se il dito scende con decisione
-            val dy = ch.position.y - anchorY
-            if (dy > cell * 1.2f && dy > abs(ch.position.x - anchorX) * 1.4f) dropping = true
-            if (dy < -cell) { dropping = false; anchorY = ch.position.y }
-            game.setSoftDrop(dropping && ch.uptimeMillis - t0 > 200)
+            while (ch.position.x - anchorX > cell * 0.9f) { game.move(1); anchorX += cell * 0.9f }
+            while (anchorX - ch.position.x > cell * 0.9f) { game.move(-1); anchorX -= cell * 0.9f }
             ch.consume()
         }
     }

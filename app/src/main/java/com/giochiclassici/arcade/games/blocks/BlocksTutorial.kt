@@ -29,7 +29,7 @@ fun blocksTutorial(): List<TutorialPage> = listOf(
     ) { MoveArt() },
     TutorialPage(
         "Falli cadere",
-        "Trascina verso il basso per farlo scendere più in fretta. Per lasciarlo cadere di colpo premi il tasto CADUTA in basso a destra.",
+        "Per far precipitare il pezzo premi il tasto CADUTA in basso a destra: è l'unico modo, così non lo fai cadere per errore.",
     ) { DropArt() },
     TutorialPage(
         "Completa le righe",

@@ -86,7 +86,6 @@ class BlocksGame(val cols: Int = 10, val rows: Int = 20) {
     private var fallAcc = 0f
     private var lockT = 0f
     private var lockResets = 0
-    private var softDrop = false
     private var overTime = 0f
     private var lockedCells: List<Pair<Int, Int>> = emptyList()
 
@@ -185,8 +184,6 @@ class BlocksGame(val cols: Int = 10, val rows: Int = 20) {
         }
     }
 
-    fun setSoftDrop(on: Boolean) { softDrop = on && canAct }
-
     fun hardDrop() {
         if (!canAct) return
         val gy = ghostY()
@@ -216,7 +213,7 @@ class BlocksGame(val cols: Int = 10, val rows: Int = 20) {
             return
         }
 
-        val interval = if (softDrop) minOf(gravity, 0.04f) else gravity
+        val interval = gravity
         if (grounded) {
             lockT += dt
             if (lockT >= 0.5f) lock()
@@ -226,7 +223,6 @@ class BlocksGame(val cols: Int = 10, val rows: Int = 20) {
         while (fallAcc >= interval && !grounded) {
             fallAcc -= interval
             py++
-            if (softDrop) score += 1
         }
     }
 
