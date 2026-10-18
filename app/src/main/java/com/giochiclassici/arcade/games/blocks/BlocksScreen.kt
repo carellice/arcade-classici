@@ -42,6 +42,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
@@ -51,17 +52,21 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giochiclassici.arcade.core.AppState
 import com.giochiclassici.arcade.core.Services
+import com.giochiclassici.arcade.ui.EmbossText
 import com.giochiclassici.arcade.ui.GameBackground
 import com.giochiclassici.arcade.ui.GameLoop
 import com.giochiclassici.arcade.ui.GameTopBar
 import com.giochiclassici.arcade.ui.Neon
 import com.giochiclassici.arcade.ui.NeonText
+import com.giochiclassici.arcade.ui.Raised
 import com.giochiclassici.arcade.ui.ResultPanel
 import com.giochiclassici.arcade.ui.StatBox
+import com.giochiclassici.arcade.ui.Surface3D
 import com.giochiclassici.arcade.ui.TutorialOverlay
 import com.giochiclassici.arcade.ui.recessed
 import kotlin.math.abs
@@ -131,7 +136,7 @@ fun BlocksScreen(onExit: () -> Unit) {
                             }
                         }
                         Spacer(Modifier.width(10.dp))
-                        SidePanel(game, best, sideW)
+                        SidePanel(game, best, sideW, hDp)
                     }
                 }
             }
@@ -167,13 +172,14 @@ fun BlocksScreen(onExit: () -> Unit) {
 }
 
 /**
- * Comandi a gesti: tocco = ruota, trascina di lato = sposta,
- * trascina in giù = discesa veloce, scatto verso il basso = caduta immediata.
+ * Comandi a gesti: tocco = ruota, trascina di lato = sposta, trascina in giù = discesa veloce.
+ * La caduta immediata ha un tasto dedicato, così non scatta per errore.
  */
 private fun Modifier.blocksControls(game: BlocksGame, cell: Float): Modifier = pointerInput(game, cell) {
     val slop = 10.dp.toPx()
     awaitEachGesture {
-        val down = awaitFirstDown(requireUnconsumed = false)
+        // I tocchi già gestiti dal tasto CADUTA non arrivano ai gesti
+        val down = awaitFirstDown(requireUnconsumed = true)
         val t0 = down.uptimeMillis
         var anchorX = down.position.x
         var anchorY = down.position.y
@@ -188,7 +194,6 @@ private fun Modifier.blocksControls(game: BlocksGame, cell: Float): Modifier = p
                 when {
                     game.phase == BlPhase.READY -> game.start()
                     !moved && dt < 350 -> game.rotate()
-                    total.y > cell * 2.5f && total.y > abs(total.x) * 1.6f && dt < 280 -> game.hardDrop()
                 }
                 break
             }
@@ -209,8 +214,8 @@ private fun Modifier.blocksControls(game: BlocksGame, cell: Float): Modifier = p
 }
 
 @Composable
-private fun SidePanel(game: BlocksGame, best: Int, width: androidx.compose.ui.unit.Dp) {
-    Column(Modifier.width(width), horizontalAlignment = Alignment.CenterHorizontally) {
+private fun SidePanel(game: BlocksGame, best: Int, width: Dp, height: Dp) {
+    Column(Modifier.width(width).height(height), horizontalAlignment = Alignment.CenterHorizontally) {
         Text("PROSSIMO", color = Neon.TextDim, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
         Spacer(Modifier.height(4.dp))
         Box(Modifier.size(width).recessed(14.dp).padding(10.dp)) {
@@ -221,7 +226,37 @@ private fun SidePanel(game: BlocksGame, best: Int, width: androidx.compose.ui.un
         }
         Spacer(Modifier.height(14.dp))
         StatBox("Record", maxOf(best, game.score).toString(), Neon.Yellow)
+        Spacer(Modifier.weight(1f))
+        // In basso, a portata di pollice
+        DropButton(Modifier.width(width)) {
+            if (game.phase == BlPhase.READY) game.start() else game.hardDrop()
+        }
     }
+}
+
+/** Tasto dedicato alla caduta immediata del pezzo. */
+@Composable
+private fun DropButton(modifier: Modifier, onClick: () -> Unit) {
+    Raised(Surface3D.solid(Neon.Orange), modifier, corner = 16.dp, depth = 6.dp, glow = 8.dp, sound = false, onClick = onClick) {
+        Column(Modifier.padding(vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Canvas(Modifier.size(26.dp)) { drawDropIcon(Neon.Bg0, size.minDimension) }
+            Spacer(Modifier.height(6.dp))
+            EmbossText("CADUTA", Neon.Bg0, 11.sp, letterSpacing = 1.sp, shadow = Color.White.copy(alpha = 0.35f))
+        }
+    }
+}
+
+/** Doppia freccia verso il basso che termina su una barra, in un quadrato di lato [s]. */
+fun DrawScope.drawDropIcon(color: Color, s: Float) {
+    val w = s
+    val h = s
+    val st = w * 0.13f
+    for (k in 0..1) {
+        val y = h * (0.12f + k * 0.3f)
+        drawLine(color, Offset(w * 0.2f, y), Offset(w * 0.5f, y + h * 0.26f), st, StrokeCap.Round)
+        drawLine(color, Offset(w * 0.8f, y), Offset(w * 0.5f, y + h * 0.26f), st, StrokeCap.Round)
+    }
+    drawLine(color, Offset(w * 0.15f, h * 0.9f), Offset(w * 0.85f, h * 0.9f), st, StrokeCap.Round)
 }
 
 /** Disegna un pezzo centrato in un riquadro quadrato di lato [box]. */

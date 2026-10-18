@@ -6,11 +6,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import com.giochiclassici.arcade.ui.Neon
 import com.giochiclassici.arcade.ui.TutorialPage
@@ -25,7 +29,7 @@ fun blocksTutorial(): List<TutorialPage> = listOf(
     ) { MoveArt() },
     TutorialPage(
         "Falli cadere",
-        "Trascina verso il basso per farlo scendere più in fretta, oppure dai uno scatto rapido in giù per lasciarlo cadere di colpo.",
+        "Trascina verso il basso per farlo scendere più in fretta. Per lasciarlo cadere di colpo premi il tasto CADUTA in basso a destra.",
     ) { DropArt() },
     TutorialPage(
         "Completa le righe",
@@ -71,15 +75,20 @@ private fun MoveArt() = WorldArt { t ->
 
 @Composable
 private fun DropArt() = WorldArt { t ->
-    for (c in 0 until 10) if (c != 4 && c != 5) drawBlock(Offset(c * C, 270f), C, Neon.Purple)
+    for (c in 0 until 7) if (c != 2 && c != 3) drawBlock(Offset(c * C, 270f), C, Neon.Purple)
     val p = (t * 0.7f) % 1f
-    val y = 20f + easeOutCubic((p * 1.6f).coerceAtMost(1f)) * 190f
-    piece(Piece.O, 0, 120f, y)
+    // Il pezzo resta in alto finché il tasto non viene premuto, poi cade di colpo
+    val pressed = p in 0.35f..0.55f
+    val y = 20f + easeOutCubic(((p - 0.35f) * 5f).coerceIn(0f, 1f)) * 190f
+    piece(Piece.O, 0, 60f, y)
     // Ombra di atterraggio
-    piece(Piece.O, 0, 120f, 210f, alpha = 0.25f)
-    val fy = 70f + (p * 2f).coerceAtMost(1f) * 120f
-    finger(Offset(240f, fy), pressed = p < 0.5f)
-    drawLine(Neon.Cyan, Offset(240f, 40f), Offset(240f, fy - 30f), 4f, StrokeCap.Round, alpha = 0.4f)
+    piece(Piece.O, 0, 60f, 210f, alpha = 0.25f)
+    // Tasto CADUTA
+    val press = if (pressed) 6f else 0f
+    drawRoundRect(lerp(Neon.Orange, Color.Black, 0.55f), Offset(222f, 206f), Size(66f, 84f), CornerRadius(14f))
+    drawRoundRect(Neon.Orange, Offset(222f, 200f + press), Size(66f, 84f - 6f), CornerRadius(14f))
+    translate(237f, 222f + press) { drawDropIcon(Neon.Bg0, 36f) }
+    finger(Offset(255f, 250f + press), pressed = pressed)
 }
 
 @Composable
