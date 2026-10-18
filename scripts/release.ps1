@@ -52,6 +52,8 @@ if (-not $gh) { Red "Serve la GitHub CLI (gh)."; exit 1 }
 $git = Find-Tool "git" @("$env:ProgramFiles\Git\cmd\git.exe", "$env:LOCALAPPDATA\Programs\Git\cmd\git.exe",
     "$env:LOCALAPPDATA\GitHubDesktop\app-*\resources\app\git\cmd\git.exe")
 if (-not $git) { Red "Serve git."; exit 1 }
+# Anche gh ha bisogno di trovare git nel PATH
+$env:PATH = "$(Split-Path -Parent $git);$env:PATH"
 
 & $gh auth status *> $null
 if ($LASTEXITCODE -ne 0) { Red "Esegui prima: gh auth login"; exit 1 }
@@ -79,7 +81,8 @@ if (-not $env:ANDROID_HOME -and -not (Test-Path local.properties) -and (Test-Pat
     $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
 }
 
-$Repo = (& $gh repo view --json nameWithOwner -q .nameWithOwner).Trim()
+$Repo = "$(& $gh repo view --json nameWithOwner -q .nameWithOwner)".Trim()
+if (-not $Repo) { Red "Impossibile determinare il repository GitHub (gh repo view)."; exit 1 }
 
 # --- Nuova versione ----------------------------------------------------------
 $props = Get-Content version.properties
