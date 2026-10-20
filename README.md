@@ -1,6 +1,6 @@
-<p align="center"><img src="docs/icon.svg" width="120" alt="Arcade Classici"></p>
+<p align="center"><img src="docs/icon.svg" width="120" alt="Arcadio"></p>
 
-<h1 align="center">Arcade Classici</h1>
+<h1 align="center">Arcadio</h1>
 
 <p align="center">Cinque giochi classici rivisitati in chiave neon/synthwave e 3D, per Android.</p>
 

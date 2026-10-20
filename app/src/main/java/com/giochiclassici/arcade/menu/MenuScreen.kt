@@ -107,8 +107,8 @@ fun MenuScreen(onPlay: (GameId) -> Unit, onSettings: () -> Unit) {
                 Modifier.graphicsLayer { translationY = sin(time * 1.4f) * 6.dp.toPx() },
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                NeonText("ARCADE", Neon.Pink, 54.sp, letterSpacing = 6.sp, glow = 40f)
-                NeonText("CLASSICI", Neon.Cyan, 24.sp, letterSpacing = 12.sp, glow = 24f)
+                NeonText("ARCADIO", Neon.Pink, 54.sp, letterSpacing = 6.sp, glow = 40f)
+                NeonText("SALA GIOCHI", Neon.Cyan, 20.sp, letterSpacing = 9.sp, glow = 24f)
             }
             Updater.availableVersion?.let { v -> UpdateBanner(v, onSettings) }
             Spacer(Modifier.height(10.dp))

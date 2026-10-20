@@ -102,7 +102,7 @@ object Updater {
                 val file = withContext(Dispatchers.IO) {
                     dir.deleteRecursively()
                     dir.mkdirs()
-                    val out = File(dir, "ArcadeClassici-${info.version}.apk")
+                    val out = File(dir, "Arcadio-${info.version}.apk")
                     downloadTo(info, out) { p -> state = UpdateState.Downloading(info, p) }
                     out
                 }
@@ -142,7 +142,7 @@ object Updater {
             connectTimeout = 10_000
             readTimeout = 20_000
             instanceFollowRedirects = true
-            setRequestProperty("User-Agent", "ArcadeClassici/$currentVersion")
+            setRequestProperty("User-Agent", "Arcadio/$currentVersion")
         }
 
     private fun fetchLatest(): ReleaseInfo? {

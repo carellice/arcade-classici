@@ -211,7 +211,7 @@ private fun UpdatesSection() {
         is UpdateState.ReadyToInstall -> {
             StatusText(
                 if (Updater.needsInstallPermission(context))
-                    "Download completato. Consenti ad Arcade Classici di installare app, poi premi Installa."
+                    "Download completato. Consenti ad Arcadio di installare app, poi premi Installa."
                 else "Download completato: conferma l'installazione nella finestra di Android."
             )
             NeonButton("Installa", Neon.Green, Modifier.fillMaxWidth(), filled = true) {
@@ -262,7 +262,7 @@ private fun ProgressBar3D(progress: Float, color: Color) {
 private fun InfoSection() {
     val context = LocalContext.current
     Text(
-        "Arcade Classici è open source (licenza MIT). Codice, segnalazioni e nuove versioni sono su GitHub.",
+        "Arcadio è open source (licenza MIT). Codice, segnalazioni e nuove versioni sono su GitHub.",
         color = Neon.Text, fontSize = 14.sp, lineHeight = 20.sp,
     )
     NeonButton("Apri su GitHub", Neon.Purple, Modifier.fillMaxWidth()) {

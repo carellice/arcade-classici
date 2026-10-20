@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Pubblica una nuova release di Arcade Classici su GitHub.
+# Pubblica una nuova release di Arcadio su GitHub.
 #
 #   scripts/release.sh [patch|minor|major|X.Y.Z] ["note di rilascio"]
 #
@@ -16,7 +16,7 @@ cd "$(dirname "$0")/.."
 
 BUMP="${1:-patch}"
 NOTES="${2:-}"
-APK_NAME="ArcadeClassici.apk"
+APK_NAME="Arcadio.apk"
 
 red()   { printf '\033[31m%s\033[0m\n' "$*"; }
 green() { printf '\033[32m%s\033[0m\n' "$*"; }
@@ -99,7 +99,7 @@ Scarica **$APK_NAME** qui sotto e installalo, oppure aggiorna direttamente dall'
 step "Commit e tag $TAG"
 git add version.properties
 git commit -q -m "Release $TAG"
-git tag -a "$TAG" -m "Arcade Classici $NEW_NAME"
+git tag -a "$TAG" -m "Arcadio $NEW_NAME"
 trap - ERR
 git push -q origin HEAD
 git push -q origin "$TAG"
@@ -108,7 +108,7 @@ git push -q origin "$TAG"
 step "Pubblicazione della release"
 gh release create "$TAG" "build/release/$APK_NAME" \
   --repo "$REPO" \
-  --title "Arcade Classici $NEW_NAME" \
+  --title "Arcadio $NEW_NAME" \
   --notes "$BODY" \
   --latest
 

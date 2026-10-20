@@ -1,5 +1,5 @@
 ﻿#
-# Pubblica una nuova release di Arcade Classici su GitHub (versione Windows di release.sh).
+# Pubblica una nuova release di Arcadio su GitHub (versione Windows di release.sh).
 #
 #   scripts\release.ps1 [patch|minor|major|X.Y.Z] ["note di rilascio"]
 #
@@ -19,7 +19,7 @@ param(
 $ErrorActionPreference = "Continue"
 Set-Location (Split-Path -Parent $PSScriptRoot)
 
-$ApkName = "ArcadeClassici.apk"
+$ApkName = "Arcadio.apk"
 
 function Red($m)   { Write-Host $m -ForegroundColor Red }
 function Green($m) { Write-Host $m -ForegroundColor Green }
@@ -132,7 +132,7 @@ try {
     Step "Commit e tag $Tag"
     Run $git add version.properties
     Run $git commit -q -m "Release $Tag"
-    Run $git tag -a $Tag -m "Arcade Classici $NewName"
+    Run $git tag -a $Tag -m "Arcadio $NewName"
 } catch {
     # Se qualcosa va storto prima del push, ripristina la versione precedente
     Red "Errore: $($_.Exception.Message)"
@@ -149,7 +149,7 @@ Step "Pubblicazione della release"
 $notesFile = [IO.Path]::GetTempFileName()
 [IO.File]::WriteAllText($notesFile, $Body, $utf8)
 try {
-    Run $gh release create $Tag "build\release\$ApkName" --repo $Repo --title "Arcade Classici $NewName" --notes-file $notesFile --latest
+    Run $gh release create $Tag "build\release\$ApkName" --repo $Repo --title "Arcadio $NewName" --notes-file $notesFile --latest
 } finally {
     Remove-Item $notesFile -ErrorAction SilentlyContinue
 }
