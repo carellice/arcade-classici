@@ -81,6 +81,19 @@ object Songs {
         )
     }
 
+    val pong: Song by lazy {
+        build(
+            bpm = 124,
+            chords = "Dm Bb F C Dm Bb Gm A",
+            lead = """
+                D5 . A5 . F5 . A5 . | F5 . D5 . Bb4 . D5 . | C5 . F5 . A5 . F5 . | E5 . G5 . C6 - G5 .
+                A5 . F5 . D5 . F5 A5 | Bb5 . A5 . F5 . D5 . | G5 . D5 . Bb4 . D5 . | C#5 . E5 . A5 - . .
+            """,
+            drums = "k h s h k h s h",
+            leadVolume = 0.12f,
+        )
+    }
+
     private fun parse(s: String): IntArray =
         s.split(' ', '|', '\n', '\t').filter { it.isNotBlank() }.map {
             when (it) {

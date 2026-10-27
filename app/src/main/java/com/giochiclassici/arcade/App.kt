@@ -24,6 +24,7 @@ import com.giochiclassici.arcade.games.breakout.BreakoutScreen
 import com.giochiclassici.arcade.games.invaders.InvadersScreen
 import com.giochiclassici.arcade.games.mines.MinesScreen
 import com.giochiclassici.arcade.games.snake.SnakeScreen
+import com.giochiclassici.arcade.games.pong.PongScreen
 import com.giochiclassici.arcade.menu.GameId
 import com.giochiclassici.arcade.menu.MenuScreen
 import com.giochiclassici.arcade.menu.SettingsScreen
@@ -47,6 +48,7 @@ fun ArcadeApp() {
                 GameId.BREAKOUT.name -> Songs.breakout
                 GameId.INVADERS.name -> Songs.invaders
                 GameId.BLOCKS.name -> Songs.blocks
+                GameId.PONG.name -> Songs.pong
                 else -> Songs.menu
             }
         )
@@ -68,6 +70,7 @@ fun ArcadeApp() {
                 GameId.BREAKOUT.name -> BreakoutScreen(onExit = exit)
                 GameId.INVADERS.name -> InvadersScreen(onExit = exit)
                 GameId.BLOCKS.name -> BlocksScreen(onExit = exit)
+                GameId.PONG.name -> PongScreen(onExit = exit)
             }
         }
     }

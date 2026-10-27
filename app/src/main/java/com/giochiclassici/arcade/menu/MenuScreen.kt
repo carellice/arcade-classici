@@ -65,6 +65,7 @@ import com.giochiclassici.arcade.games.mines.drawHiddenTile
 import com.giochiclassici.arcade.games.mines.drawRevealedTile
 import com.giochiclassici.arcade.games.snake.drawApple
 import com.giochiclassici.arcade.games.snake.drawSnake
+import com.giochiclassici.arcade.games.pong.drawPongPreview
 import com.giochiclassici.arcade.ui.IconBtn
 import com.giochiclassici.arcade.ui.Raised
 import com.giochiclassici.arcade.ui.Surface3D
@@ -90,6 +91,7 @@ enum class GameId(val title: String, val tagline: String, val color: Color) {
     BREAKOUT("BREAKOUT", "Distruggi ogni mattone", Neon.Pink),
     INVADERS("INVASORI", "Difendi la Terra dagli alieni", Neon.Purple),
     BLOCKS("BLOCCHI", "Incastra i pezzi, cancella le righe", Neon.Orange),
+    PONG("PONG", "Il duello originale · 1v1 o 1vCPU", Neon.Teal),
 }
 
 @Composable
@@ -119,6 +121,7 @@ fun MenuScreen(onPlay: (GameId) -> Unit, onSettings: () -> Unit) {
             ) {
                 GameId.entries.forEachIndexed { i, g ->
                     val record = when (g) {
+                        GameId.PONG -> "1v1 locale · 3 difficoltà CPU"
                         GameId.SNAKE -> prefs.best("best_snake").takeIf { it > 0 }?.let { "Record: $it" }
                         GameId.BREAKOUT -> prefs.best("best_breakout").takeIf { it > 0 }?.let { "Record: $it" }
                         GameId.INVADERS -> prefs.best("best_invaders").takeIf { it > 0 }?.let { "Record: $it" }
@@ -243,6 +246,7 @@ private fun GamePreview(game: GameId) {
     Canvas(Modifier.fillMaxSize().padding(8.dp)) {
         val t = time
         when (game) {
+            GameId.PONG -> drawPongPreview(t)
             GameId.SNAKE -> {
                 val cell = size.width / 6f
                 // Percorso ad anello su una griglia 6×6
