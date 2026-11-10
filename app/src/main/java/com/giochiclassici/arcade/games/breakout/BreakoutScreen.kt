@@ -110,6 +110,8 @@ fun BreakoutScreen(onExit: () -> Unit) {
                 ) {
                     StatBox("Punti", game.score.toString(), accent)
                     StatBox("Livello", game.level.toString(), Neon.Cyan)
+                    // Il record da battere, quello di inizio partita: solo se ce n'è uno.
+                    if (startBest > 0) StatBox("Record", startBest.toString(), Neon.Yellow)
                     LivesBox(game.lives)
                 }
                 Box(Modifier.fillMaxSize()) {

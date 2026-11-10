@@ -104,6 +104,9 @@ fun MinesScreen(onExit: () -> Unit) {
                 StatBox("Mine", game.minesLeft.toString(), Neon.Pink)
                 FaceButton(game.face) { newGame() }
                 StatBox("Tempo", formatTime(game.seconds), accent)
+                // Il tempo da battere per questa difficoltà, se c'è.
+                val record = remember(diff, newRecord) { prefs.best(diff.bestKey) }
+                if (record > 0) StatBox("Record", formatTime(record), Neon.Yellow)
             }
             DifficultyBar(diff) { newGame(it) }
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(12.dp), contentAlignment = Alignment.Center) {

@@ -112,6 +112,8 @@ fun InvadersScreen(onExit: () -> Unit) {
                 ) {
                     StatBox("Punti", game.score.toString(), accent)
                     StatBox("Ondata", game.wave.toString(), Neon.Cyan)
+                    // Il record da battere, quello di inizio partita: solo se ce n'è uno.
+                    if (startBest > 0) StatBox("Record", startBest.toString(), Neon.Yellow)
                     StatBox("Vite", "♥".repeat(game.lives.coerceIn(0, 5)).ifEmpty { "-" }, Neon.Red)
                 }
                 Box(Modifier.fillMaxSize()) {

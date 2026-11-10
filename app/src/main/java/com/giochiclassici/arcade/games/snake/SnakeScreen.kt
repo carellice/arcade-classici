@@ -99,7 +99,8 @@ fun SnakeScreen(onExit: () -> Unit) {
                 ) {
                     StatBox("Punti", game.score.toString(), accent)
                     StatBox("Livello", game.level.toString(), Neon.Cyan)
-                    StatBox("Record", maxOf(best, game.score).toString(), Neon.Yellow)
+                    // Il record da battere: si aggiorna a fine partita, e non compare finché non ce n'è uno.
+                    if (best > 0) StatBox("Record", best.toString(), Neon.Yellow)
                 }
                 Box(Modifier.fillMaxSize().padding(bottom = 16.dp), contentAlignment = Alignment.Center) {
                     val wDp = with(density) { (cell * COLS).toDp() }

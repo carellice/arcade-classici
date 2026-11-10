@@ -136,7 +136,7 @@ fun BlocksScreen(onExit: () -> Unit) {
                             }
                         }
                         Spacer(Modifier.width(10.dp))
-                        SidePanel(game, best, sideW, hDp)
+                        SidePanel(game, startBest, sideW, hDp)
                     }
                 }
             }
@@ -216,7 +216,8 @@ private fun SidePanel(game: BlocksGame, best: Int, width: Dp, height: Dp) {
             }
         }
         Spacer(Modifier.height(14.dp))
-        StatBox("Record", maxOf(best, game.score).toString(), Neon.Yellow)
+        // Il record da battere, quello di inizio partita: solo se ce n'è uno.
+        if (best > 0) StatBox("Record", best.toString(), Neon.Yellow)
         Spacer(Modifier.weight(1f))
         // In basso, a portata di pollice
         DropButton(Modifier.width(width)) {
