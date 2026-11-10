@@ -28,7 +28,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.zIndex
+import com.giochiclassici.arcade.core.Haptics
+import kotlin.math.roundToInt
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -102,6 +112,15 @@ enum class GameId(val title: String, val tagline: String, val color: Color) {
 fun MenuScreen(onPlay: (GameId) -> Unit, onSettings: () -> Unit) {
     val prefs = Services.prefs
     val time by rememberTime()
+    // Ordine salvato; i giochi nuovi (o mai spostati) finiscono in fondo.
+    val order = remember {
+        val saved = prefs.order("game_order").mapNotNull { n -> GameId.entries.firstOrNull { it.name == n } }
+        (saved + GameId.entries.filter { it !in saved }).toMutableStateList()
+    }
+    var dragged by remember { mutableStateOf<GameId?>(null) }
+    var dragY by remember { mutableFloatStateOf(0f) }
+    // Altezza scheda (106 + 8 di spessore) più lo spazio tra le schede.
+    val step = with(LocalDensity.current) { (106.dp + 8.dp + 14.dp).toPx() }
     Box(Modifier.fillMaxSize()) {
         SynthwaveBackground()
         Column(
@@ -123,7 +142,7 @@ fun MenuScreen(onPlay: (GameId) -> Unit, onSettings: () -> Unit) {
                     .padding(horizontal = 10.dp, vertical = 14.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                GameId.entries.forEachIndexed { i, g ->
+                order.forEachIndexed { i, g -> key(g) {
                     val record = when (g) {
                         GameId.PONG -> "1v1 locale · 3 difficoltà CPU"
                         GameId.TRIS -> "1v1 locale · 3 difficoltà CPU"
@@ -138,8 +157,31 @@ fun MenuScreen(onPlay: (GameId) -> Unit, onSettings: () -> Unit) {
                             prefs.best(d.bestKey).takeIf { it > 0 }?.let { "Record ${d.label}: ${formatTime(it)}" }
                         }
                     } ?: "Nuovo!"
-                    GameCard(g, record, i) { onPlay(g) }
-                }
+                    val dragging = dragged == g
+                    // Tieni premuta una scheda e trascinala per cambiare l'ordine dei giochi.
+                    val reorder = Modifier.zIndex(if (dragging) 1f else 0f).graphicsLayer {
+                        if (dragging) { translationY = dragY; scaleX = 1.04f; scaleY = 1.04f }
+                    }.pointerInput(g) {
+                        val end = { dragged = null; dragY = 0f; prefs.saveOrder("game_order", order.map { it.name }) }
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = { dragged = g; dragY = 0f; Haptics.bump() },
+                            onDrag = { change, amount ->
+                                change.consume()
+                                dragY += amount.y
+                                val from = order.indexOf(g)
+                                val to = (from + (dragY / step).roundToInt()).coerceIn(0, order.lastIndex)
+                                if (to != from) {
+                                    order.add(to, order.removeAt(from))
+                                    dragY -= (to - from) * step
+                                    Haptics.tick()
+                                }
+                            },
+                            onDragEnd = end,
+                            onDragCancel = end,
+                        )
+                    }
+                    GameCard(g, record, i, reorder) { onPlay(g) }
+                } }
             }
             Row(
                 Modifier.padding(top = 6.dp, bottom = 14.dp),
@@ -187,7 +229,7 @@ private fun SettingToggle(label: String, on: Boolean, onClick: () -> Unit, icon:
 }
 
 @Composable
-private fun GameCard(game: GameId, record: String, index: Int, onClick: () -> Unit) {
+private fun GameCard(game: GameId, record: String, index: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val enter = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(120L + index * 110L)
@@ -195,7 +237,7 @@ private fun GameCard(game: GameId, record: String, index: Int, onClick: () -> Un
     }
     Raised(
         Surface3D.panel(game.color),
-        Modifier
+        modifier
             .graphicsLayer {
                 alpha = enter.value
                 translationX = (1f - enter.value) * 60.dp.toPx() * (if (index % 2 == 0) -1 else 1)

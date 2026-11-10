@@ -22,6 +22,7 @@
 - **Tris** – tre in fila su griglia 3×3, 1vCPU con tre difficoltà (Imbattibile non perde mai) o 1v1 sullo stesso telefono
 
 Ogni gioco ha un tutorial illustrato, musica propria ed effetti sonori sintetizzati in tempo reale.
+Nel menu basta tenere premuta una scheda e trascinarla per mettere i giochi nell'ordine preferito.
 L'app si aggiorna da sola: in **Impostazioni → Aggiornamenti** controlla l'ultima release di questo repository.
 
 ## Tecnologie

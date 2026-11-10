@@ -76,6 +76,10 @@ class Prefs(context: Context) {
         return true
     }
 
+    /** Un elenco di nomi salvato in ordine (es. la disposizione dei giochi nel menu). */
+    fun order(key: String): List<String> = sp.getString(key, null)?.split(',')?.filter { it.isNotEmpty() } ?: emptyList()
+    fun saveOrder(key: String, names: List<String>) = sp.edit { putString(key, names.joinToString(",")) }
+
     fun tutorialSeen(game: String) = sp.getBoolean("tut_$game", false)
     fun markTutorialSeen(game: String) = sp.edit { putBoolean("tut_$game", true) }
 }
