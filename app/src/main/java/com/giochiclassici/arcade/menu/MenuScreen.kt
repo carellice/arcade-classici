@@ -59,6 +59,7 @@ import com.giochiclassici.arcade.games.breakout.drawBall
 import com.giochiclassici.arcade.games.breakout.drawBrick
 import com.giochiclassici.arcade.games.breakout.drawPaddle
 import com.giochiclassici.arcade.games.mines.MineDiff
+import com.giochiclassici.arcade.games.sudoku.SudokuDiff
 import com.giochiclassici.arcade.games.mines.NumberColors
 import com.giochiclassici.arcade.games.mines.drawFlag
 import com.giochiclassici.arcade.games.mines.drawHiddenTile
@@ -92,6 +93,7 @@ enum class GameId(val title: String, val tagline: String, val color: Color) {
     INVADERS("INVASORI", "Difendi la Terra dagli alieni", Neon.Purple),
     BLOCKS("BLOCCHI", "Incastra i pezzi, cancella le righe", Neon.Orange),
     PONG("PONG", "Il duello originale · 1v1 o 1vCPU", Neon.Teal),
+    SUDOKU("SUDOKU", "Nove numeri, una sola soluzione", Neon.Yellow),
 }
 
 @Composable
@@ -126,6 +128,9 @@ fun MenuScreen(onPlay: (GameId) -> Unit, onSettings: () -> Unit) {
                         GameId.BREAKOUT -> prefs.best("best_breakout").takeIf { it > 0 }?.let { "Record: $it" }
                         GameId.INVADERS -> prefs.best("best_invaders").takeIf { it > 0 }?.let { "Record: $it" }
                         GameId.BLOCKS -> prefs.best("best_blocks").takeIf { it > 0 }?.let { "Record: $it" }
+                        GameId.SUDOKU -> SudokuDiff.entries.reversed().firstNotNullOfOrNull { d ->
+                            prefs.best(d.bestKey).takeIf { it > 0 }?.let { "Record ${d.label}: ${formatTime(it)}" }
+                        }
                         GameId.MINES -> MineDiff.entries.reversed().firstNotNullOfOrNull { d ->
                             prefs.best(d.bestKey).takeIf { it > 0 }?.let { "Record ${d.label}: ${formatTime(it)}" }
                         }
@@ -247,6 +252,19 @@ private fun GamePreview(game: GameId) {
         val t = time
         when (game) {
             GameId.PONG -> drawPongPreview(t)
+            GameId.SUDOKU -> {
+                // Griglia 3×3 che si riempie una casella alla volta.
+                val c = size.width / 3f
+                val filled = ((t * 1.5f).toInt() % 10)
+                for (i in 0 until 9) {
+                    val tl = Offset(i % 3 * c, i / 3 * c)
+                    if (i < filled) drawRect(if (i % 2 == 0) Neon.Yellow else Neon.Cyan, tl + Offset(c * 0.18f, c * 0.18f), androidx.compose.ui.geometry.Size(c * 0.64f, c * 0.64f), alpha = 0.85f)
+                }
+                for (k in 0..3) {
+                    drawLine(Neon.Yellow.copy(alpha = 0.6f), Offset(k * c, 0f), Offset(k * c, size.height), 2f)
+                    drawLine(Neon.Yellow.copy(alpha = 0.6f), Offset(0f, k * c), Offset(size.width, k * c), 2f)
+                }
+            }
             GameId.SNAKE -> {
                 val cell = size.width / 6f
                 // Percorso ad anello su una griglia 6×6
