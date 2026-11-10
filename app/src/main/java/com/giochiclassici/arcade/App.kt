@@ -27,6 +27,7 @@ import com.giochiclassici.arcade.games.snake.SnakeScreen
 import com.giochiclassici.arcade.games.pong.PongScreen
 import com.giochiclassici.arcade.menu.GameId
 import com.giochiclassici.arcade.games.sudoku.SudokuScreen
+import com.giochiclassici.arcade.games.tris.TrisScreen
 import com.giochiclassici.arcade.menu.MenuScreen
 import com.giochiclassici.arcade.menu.SettingsScreen
 import com.giochiclassici.arcade.update.Updater
@@ -52,6 +53,7 @@ fun ArcadeApp() {
                 GameId.PONG.name -> Songs.pong
                 // Un gioco di pensiero come Campo minato: la stessa musica tranquilla.
                 GameId.SUDOKU.name -> Songs.mines
+                GameId.TRIS.name -> Songs.mines
                 else -> Songs.menu
             }
         )
@@ -75,6 +77,7 @@ fun ArcadeApp() {
                 GameId.BLOCKS.name -> BlocksScreen(onExit = exit)
                 GameId.PONG.name -> PongScreen(onExit = exit)
                 GameId.SUDOKU.name -> SudokuScreen(onExit = exit)
+                GameId.TRIS.name -> TrisScreen(onExit = exit)
             }
         }
     }

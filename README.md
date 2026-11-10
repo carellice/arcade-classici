@@ -2,7 +2,7 @@
 
 <h1 align="center">Arcadio</h1>
 
-<p align="center">Sette giochi classici rivisitati in chiave neon/synthwave e 3D, per Android.</p>
+<p align="center">Otto giochi classici rivisitati in chiave neon/synthwave e 3D, per Android.</p>
 
 <p align="center"><a href="../../releases/latest"><b>⬇ Scarica l'ultima versione (APK)</b></a></p>
 
@@ -19,6 +19,7 @@
 - **Blocchi** – in stile Tetris: rotazione con un tocco, caduta istantanea, ombra di atterraggio e livelli sempre più veloci
 - **PONG** – duello a 11 punti, 1vCPU con tre difficoltà o 1v1 locale con controlli touch simultanei; supporta anche W/S e frecce sulla tastiera
 - **Sudoku** – tre difficoltà con schemi sempre a soluzione unica, numeri uguali evidenziati, errori in rosa e record del tempo per difficoltà
+- **Tris** – tre in fila su griglia 3×3, 1vCPU con tre difficoltà (Imbattibile non perde mai) o 1v1 sullo stesso telefono
 
 Ogni gioco ha un tutorial illustrato, musica propria ed effetti sonori sintetizzati in tempo reale.
 L'app si aggiorna da sola: in **Impostazioni → Aggiornamenti** controlla l'ultima release di questo repository.
