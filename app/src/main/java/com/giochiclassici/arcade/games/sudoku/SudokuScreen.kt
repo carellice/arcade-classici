@@ -251,18 +251,114 @@ private fun DrawScope.drawBoard(game: SudokuGame, cell: Float, styles: NumberSty
 
 fun sudokuTutorial(): List<TutorialPage> = listOf(
     TutorialPage(
-        "L'obiettivo",
-        "Riempi lo schema: ogni riga, ogni colonna e ogni riquadro 3×3 contiene i numeri da 1 a 9, una volta sola.",
+        "Lo schema",
+        "81 caselle divise in 9 righe, 9 colonne e 9 riquadri 3×3 (bordati in giallo). Alcune caselle hanno già un numero: non si possono cambiare.",
+    ) { ZonesArt() },
+    TutorialPage(
+        "L'unica regola",
+        "In ogni riga, in ogni colonna e in ogni riquadro devono esserci tutti i numeri da 1 a 9, ognuno una volta sola. Niente doppioni.",
     ) { MiniArt(highlightRow = true) },
     TutorialPage(
+        "Non si tira a indovinare",
+        "Ogni schema ha una sola soluzione e si risolve solo ragionando: nessun calcolo, i numeri sono solo simboli. Parti da dove ci sono più indizi.",
+    ) { MiniArt(highlightRow = false) },
+    TutorialPage(
+        "Trucco 1: cosa manca?",
+        "Se in una riga c'è già tutto tranne un numero, la casella vuota prende quello. Vale anche per colonne e riquadri.",
+    ) { MissingArt() },
+    TutorialPage(
+        "Trucco 2: escludi",
+        "Per una casella vuota, togli i numeri già presenti nella sua riga, colonna e riquadro. Se ne resta uno solo, è lui!",
+    ) { ExcludeArt() },
+    TutorialPage(
         "Scegli e scrivi",
-        "Tocca una casella vuota, poi un numero in basso. La ✕ cancella. I numeri uguali si illuminano in tutto lo schema.",
+        "Tocca una casella vuota, poi un numero in basso. La ✕ cancella. I numeri uguali si illuminano: così vedi subito dove un numero non può andare.",
     ) { MiniArt(highlightRow = false) },
     TutorialPage(
         "Occhio agli errori",
-        "Un numero che si scontra con un altro diventa rosa. Ogni sbaglio conta: più veloce e preciso sei, migliore è il record.",
+        "Un numero sbagliato diventa rosa. Ogni sbaglio conta: più veloce e preciso sei, migliore è il record.",
     ) { MiniArt(highlightRow = false, wrong = true) },
 )
+
+/** Lo schema 9×9 con una riga, una colonna e un riquadro che si illuminano a turno. */
+@Composable
+private fun ZonesArt() {
+    val time by rememberTime()
+    Canvas(Modifier.fillMaxSize().padding(18.dp)) {
+        val cell = min(size.width, size.height) / 9f
+        val origin = Offset((size.width - cell * 9) / 2, (size.height - cell * 9) / 2)
+        val zone = time.toInt() % 3
+        val colors = listOf(Neon.Cyan, Neon.Pink, Neon.Green)
+        for (i in 0 until 81) {
+            val x = i % 9; val y = i / 9
+            val on = when (zone) { 0 -> y == 4; 1 -> x == 4; else -> x / 3 == 1 && y / 3 == 1 }
+            if (on) drawRect(colors[zone].copy(alpha = 0.45f), origin + Offset(x * cell, y * cell), Size(cell, cell))
+            else if ((i * 7) % 5 == 0) drawCircle(Neon.Text.copy(alpha = 0.5f), cell * 0.14f, origin + Offset((x + 0.5f) * cell, (y + 0.5f) * cell))
+        }
+        for (k in 0..9) {
+            val thick = k % 3 == 0
+            val c = if (thick) Neon.Yellow.copy(alpha = 0.8f) else Color.White.copy(alpha = 0.15f)
+            val w = if (thick) 3f else 1f
+            drawLine(c, origin + Offset(k * cell, 0f), origin + Offset(k * cell, cell * 9), w)
+            drawLine(c, origin + Offset(0f, k * cell), origin + Offset(cell * 9, k * cell), w)
+        }
+    }
+}
+
+/** Una riga con otto numeri: la casella vuota passa da "?" al 4 che manca. */
+@Composable
+private fun MissingArt() {
+    val time by rememberTime()
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val style = TextStyle(fontSize = with(density) { 13.dp.toSp() }, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace)
+    val row = intArrayOf(5, 3, 0, 6, 7, 8, 9, 1, 2)
+    val nums = remember { (1..9).map { measurer.measure(it.toString(), style.copy(color = Neon.Text)) } }
+    val ask = remember { measurer.measure("?", style.copy(color = Neon.Yellow)) }
+    val found = remember { measurer.measure("4", style.copy(color = Neon.Green)) }
+    Canvas(Modifier.fillMaxSize().padding(10.dp)) {
+        val cell = size.width / 9f
+        val top = (size.height - cell) / 2
+        val solved = time % 2.4f > 1.2f
+        for (i in 0 until 9) {
+            val tl = Offset(i * cell, top)
+            if (row[i] == 0) drawRect((if (solved) Neon.Green else Neon.Yellow).copy(alpha = 0.25f), tl, Size(cell, cell))
+            val l = if (row[i] != 0) nums[row[i] - 1] else if (solved) found else ask
+            drawText(l, topLeft = tl + Offset((cell - l.size.width) / 2f, (cell - l.size.height) / 2f))
+        }
+        for (k in 0..9) drawLine(Neon.Yellow.copy(alpha = if (k % 3 == 0) 0.8f else 0.3f), Offset(k * cell, top), Offset(k * cell, top + cell), 2f)
+        drawRect(Neon.Yellow.copy(alpha = 0.8f), Offset(0f, top), Size(cell * 9, cell), style = Stroke(2f))
+    }
+}
+
+/** I numeri da 1 a 9 che si spengono uno alla volta finché resta solo quello giusto. */
+@Composable
+private fun ExcludeArt() {
+    val time by rememberTime()
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val style = TextStyle(fontSize = with(density) { 20.dp.toSp() }, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace)
+    val on = remember { (1..9).map { measurer.measure(it.toString(), style.copy(color = Neon.Text)) } }
+    val off = remember { (1..9).map { measurer.measure(it.toString(), style.copy(color = Neon.TextDim.copy(alpha = 0.25f))) } }
+    val win = remember { measurer.measure("7", style.copy(color = Neon.Green)) }
+    // Ordine in cui i numeri vengono esclusi (già presenti in riga, colonna o riquadro): resta il 7.
+    val order = intArrayOf(3, 9, 1, 5, 8, 2, 6, 4)
+    Canvas(Modifier.fillMaxSize().padding(24.dp)) {
+        val cell = min(size.width, size.height) / 3f
+        val origin = Offset((size.width - cell * 3) / 2, (size.height - cell * 3) / 2)
+        val step = (time * 2f).toInt() % (order.size + 4)
+        val gone = order.take(step).toSet()
+        val done = step >= order.size
+        for (n in 1..9) {
+            val tl = origin + Offset((n - 1) % 3 * cell, (n - 1) / 3 * cell)
+            if (done && n == 7) drawRect(Neon.Green.copy(alpha = 0.25f), tl, Size(cell, cell))
+            val l = when { done && n == 7 -> win; n in gone -> off[n - 1]; else -> on[n - 1] }
+            drawText(l, topLeft = tl + Offset((cell - l.size.width) / 2f, (cell - l.size.height) / 2f))
+            if (n in gone) drawLine(Neon.Pink.copy(alpha = 0.8f), tl + Offset(cell * 0.25f, cell * 0.75f), tl + Offset(cell * 0.75f, cell * 0.25f), 3f)
+        }
+        drawRect(Neon.Yellow, origin, Size(cell * 3, cell * 3), style = Stroke(4f), alpha = 0.5f)
+    }
+}
 
 @Composable
 private fun MiniArt(highlightRow: Boolean, wrong: Boolean = false) {
