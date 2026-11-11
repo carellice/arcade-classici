@@ -123,9 +123,10 @@ fun TrisScreen(onExit: () -> Unit) {
                 }
             }
             if (g != null) {
-                Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    NeonButton("Cambia modalità", Neon.TextDim, Modifier.weight(1f)) { game = null }
-                    if (g.over) NeonButton("Ancora", accent, Modifier.weight(1f), filled = true) { g.nextRound(); version++; Audio.play(Sfx.Start) }
+                // Uno sopra l'altro a tutta larghezza: affiancati "Cambia modalità" andava a capo.
+                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (g.over) NeonButton("Ancora", accent, Modifier.fillMaxWidth(), filled = true) { g.nextRound(); version++; Audio.play(Sfx.Start) }
+                    NeonButton("Cambia modalità", Neon.TextDim, Modifier.fillMaxWidth()) { game = null }
                 }
             }
         }
