@@ -151,7 +151,10 @@ private fun DifficultyBar(current: SudokuDiff, onSelect: (SudokuDiff) -> Unit) {
     }
 }
 
-/** I tasti da 1 a 9 e la gomma: un numero già messo nove volte si spegne. */
+/**
+ * I tasti da 1 a 9 e la gomma: un numero già messo nove volte si spegne. Tenendo premuto un tasto
+ * con una casella vuota scelta, quel numero si sbarra per la casella.
+ */
 @Composable
 private fun NumberPad(game: SudokuGame) {
     game.frame
@@ -160,12 +163,19 @@ private fun NumberPad(game: SudokuGame) {
             Row(Modifier.fillMaxWidth().height(54.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (n in row) {
                     val done = game.count(n) >= 9
+                    val crossed = game.isExcluded(n)
                     Raised(
-                        if (done) Surface3D.solid(Neon.TextDim) else Surface3D.solid(Neon.Cyan),
+                        if (done || crossed) Surface3D.solid(Neon.TextDim) else Surface3D.solid(Neon.Cyan),
                         Modifier.weight(1f).fillMaxHeight(), corner = 14.dp, depth = 4.dp,
                         onClick = { game.input(n) },
+                        onLongClick = { game.toggleExcluded(n) },
                     ) {
-                        Text(n.toString(), color = Neon.Bg0, fontSize = 24.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace)
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(n.toString(), color = Neon.Bg0.copy(alpha = if (crossed) 0.55f else 1f), fontSize = 24.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace)
+                            if (crossed) Canvas(Modifier.size(30.dp)) {
+                                drawLine(Neon.Pink, Offset(size.width * 0.15f, size.height * 0.85f), Offset(size.width * 0.85f, size.height * 0.15f), strokeWidth = 3.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
+                            }
+                        }
                     }
                 }
                 if (row.last == 9) {

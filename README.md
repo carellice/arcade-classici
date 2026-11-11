@@ -18,7 +18,7 @@
 - **Invasori** – in stile Space Invaders: alieni voxel, scudi distruttibili, UFO e potenziamenti
 - **Blocchi** – in stile Tetris: rotazione con un tocco, caduta istantanea, ombra di atterraggio e livelli sempre più veloci
 - **PONG** – duello a 11 punti, 1vCPU con tre difficoltà o 1v1 locale con controlli touch simultanei; supporta anche W/S e frecce sulla tastiera
-- **Sudoku** – tre difficoltà con schemi sempre a soluzione unica, numeri uguali evidenziati, errori in rosa e record del tempo per difficoltà
+- **Sudoku** – tre difficoltà con schemi sempre a soluzione unica, numeri uguali evidenziati, errori in rosa, numeri da sbarrare tenendo premuto il tasto e record del tempo per difficoltà
 - **Tris** – tre in fila su griglia 3×3, 1vCPU con tre difficoltà (Imbattibile non perde mai) o 1v1 sullo stesso telefono
 
 Ogni gioco ha un tutorial illustrato, musica propria ed effetti sonori sintetizzati in tempo reale.

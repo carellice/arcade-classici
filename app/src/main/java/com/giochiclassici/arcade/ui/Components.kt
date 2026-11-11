@@ -11,6 +11,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -213,12 +214,19 @@ fun Raised(
     glow: Dp = 0.dp,
     sound: Boolean = true,
     onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val src = remember { MutableInteractionSource() }
     val pressed by src.collectIsPressedAsState()
     val press by animateFloatAsState(if (pressed) 1f else 0f, spring(stiffness = 1200f), label = "press3d")
-    val clickMod = if (onClick != null) {
+    val clickMod = if (onClick != null && onLongClick != null) {
+        Modifier.combinedClickable(src, null, onLongClick = { Haptics.bump(); onLongClick() }) {
+            if (sound) Audio.play(Sfx.Click)
+            Haptics.tick()
+            onClick()
+        }
+    } else if (onClick != null) {
         Modifier.clickable(src, null) {
             if (sound) Audio.play(Sfx.Click)
             Haptics.tick()

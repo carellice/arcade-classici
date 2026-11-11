@@ -77,6 +77,22 @@ class SudokuGame(val diff: SudokuDiff, random: Random = Random.Default) {
         frame++
     }
 
+    /** Per ogni casella, i numeri che il giocatore ha escluso (bit n acceso = n sbarrato). */
+    private val excluded = IntArray(81)
+
+    fun isExcluded(n: Int): Boolean {
+        val i = selected
+        return i >= 0 && grid[i] == 0 && excluded[i] and (1 shl n) != 0
+    }
+
+    /** Sbarra o ripristina [n] sul tastierino, solo per la casella vuota scelta. */
+    fun toggleExcluded(n: Int) {
+        val i = selected
+        if (phase != SudokuPhase.PLAYING || i < 0 || grid[i] != 0) return
+        excluded[i] = excluded[i] xor (1 shl n)
+        frame++
+    }
+
     /** Il numero va contro un altro uguale nella stessa riga, colonna o riquadro. */
     fun conflict(i: Int): Boolean {
         val n = grid[i]
