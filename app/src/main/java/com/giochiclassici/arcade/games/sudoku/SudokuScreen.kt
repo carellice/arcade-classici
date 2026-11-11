@@ -268,7 +268,7 @@ fun sudokuTutorial(): List<TutorialPage> = listOf(
     ) { MissingArt() },
     TutorialPage(
         "Trucco 2: escludi",
-        "Per una casella vuota, togli i numeri già presenti nella sua riga, colonna e riquadro. Se ne resta uno solo, è lui!",
+        "Guarda la casella col ?: nella sua riga ci sono già 3, 9, 1 e 5, nella sua colonna 8, 2, 6 e 4. Cancellali dalla fila 1–9 in basso: resta solo il 7, quindi va lì. Conta anche il riquadro!",
     ) { ExcludeArt() },
     TutorialPage(
         "Scegli e scrivi",
@@ -331,32 +331,60 @@ private fun MissingArt() {
     }
 }
 
-/** I numeri da 1 a 9 che si spengono uno alla volta finché resta solo quello giusto. */
+/**
+ * La riga e la colonna di una casella vuota: i loro numeri si illuminano uno alla volta
+ * e si cancellano dalla fila 1–9 in basso, finché resta solo il 7 che va nella casella.
+ */
 @Composable
 private fun ExcludeArt() {
     val time by rememberTime()
     val measurer = rememberTextMeasurer()
     val density = LocalDensity.current
-    val style = TextStyle(fontSize = with(density) { 20.dp.toSp() }, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace)
+    val style = TextStyle(fontSize = with(density) { 12.dp.toSp() }, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace)
     val on = remember { (1..9).map { measurer.measure(it.toString(), style.copy(color = Neon.Text)) } }
     val off = remember { (1..9).map { measurer.measure(it.toString(), style.copy(color = Neon.TextDim.copy(alpha = 0.25f))) } }
+    val ask = remember { measurer.measure("?", style.copy(color = Neon.Yellow)) }
     val win = remember { measurer.measure("7", style.copy(color = Neon.Green)) }
-    // Ordine in cui i numeri vengono esclusi (già presenti in riga, colonna o riquadro): resta il 7.
-    val order = intArrayOf(3, 9, 1, 5, 8, 2, 6, 4)
-    Canvas(Modifier.fillMaxSize().padding(24.dp)) {
-        val cell = min(size.width, size.height) / 3f
-        val origin = Offset((size.width - cell * 3) / 2, (size.height - cell * 3) / 2)
-        val step = (time * 2f).toInt() % (order.size + 4)
+    // Riga e colonna che passano dalla casella al centro (0 = vuota): manca solo il 7.
+    val row = intArrayOf(3, 0, 9, 0, 0, 1, 0, 5, 0)
+    val col = intArrayOf(8, 0, 2, 0, 0, 0, 6, 0, 4)
+    val order = intArrayOf(3, 9, 1, 5, 8, 2, 6, 4) // prima quelli della riga, poi della colonna
+    Canvas(Modifier.fillMaxSize().padding(10.dp)) {
+        val cell = min(size.width / 9f, size.height / 10.6f)
+        val origin = Offset((size.width - cell * 9) / 2, (size.height - cell * 10.6f) / 2)
+        val step = (time * 1.6f).toInt() % (order.size + 4)
         val gone = order.take(step).toSet()
-        val done = step >= order.size
+        val current = if (step in 1..order.size) order[step - 1] else 0
+        val done = step > order.size
+        val rowPhase = step in 1..4
+        val colPhase = step in 5..order.size
+        fun cellAt(x: Int, y: Int, n: Int, lit: Boolean) {
+            val tl = origin + Offset(x * cell, y * cell)
+            drawRect((if (lit) Neon.Cyan else Color.White).copy(alpha = if (lit) 0.18f else 0.05f), tl, Size(cell, cell))
+            drawRect(Color.White.copy(alpha = 0.18f), tl, Size(cell, cell), style = Stroke(1f))
+            if (n == 0) return
+            if (n == current) drawRect(Neon.Pink.copy(alpha = 0.45f), tl, Size(cell, cell))
+            val l = on[n - 1]
+            drawText(l, topLeft = tl + Offset((cell - l.size.width) / 2f, (cell - l.size.height) / 2f))
+        }
+        for (x in 0 until 9) if (x != 4) cellAt(x, 4, row[x], rowPhase)
+        for (y in 0 until 9) if (y != 4) cellAt(4, y, col[y], colPhase)
+        // La casella da riempire, al centro della croce.
+        val target = origin + Offset(4 * cell, 4 * cell)
+        drawRect((if (done) Neon.Green else Neon.Yellow).copy(alpha = 0.3f), target, Size(cell, cell))
+        drawRect(Neon.Yellow, target, Size(cell, cell), style = Stroke(2f))
+        val t = if (done) win else ask
+        drawText(t, topLeft = target + Offset((cell - t.size.width) / 2f, (cell - t.size.height) / 2f))
+        // La fila dei candidati 1–9: ogni numero visto sopra viene cancellato.
+        val top = origin.y + cell * 9.6f
         for (n in 1..9) {
-            val tl = origin + Offset((n - 1) % 3 * cell, (n - 1) / 3 * cell)
-            if (done && n == 7) drawRect(Neon.Green.copy(alpha = 0.25f), tl, Size(cell, cell))
+            val tl = Offset(origin.x + (n - 1) * cell, top)
+            if (done && n == 7) drawRect(Neon.Green.copy(alpha = 0.3f), tl, Size(cell, cell))
             val l = when { done && n == 7 -> win; n in gone -> off[n - 1]; else -> on[n - 1] }
             drawText(l, topLeft = tl + Offset((cell - l.size.width) / 2f, (cell - l.size.height) / 2f))
-            if (n in gone) drawLine(Neon.Pink.copy(alpha = 0.8f), tl + Offset(cell * 0.25f, cell * 0.75f), tl + Offset(cell * 0.75f, cell * 0.25f), 3f)
+            if (n in gone) drawLine(Neon.Pink.copy(alpha = 0.8f), tl + Offset(cell * 0.2f, cell * 0.8f), tl + Offset(cell * 0.8f, cell * 0.2f), 2.5f)
         }
-        drawRect(Neon.Yellow, origin, Size(cell * 3, cell * 3), style = Stroke(4f), alpha = 0.5f)
+        drawRect(Neon.Yellow.copy(alpha = 0.6f), Offset(origin.x, top), Size(cell * 9, cell), style = Stroke(2f))
     }
 }
 
