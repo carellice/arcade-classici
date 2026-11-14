@@ -78,6 +78,9 @@ import com.giochiclassici.arcade.games.snake.drawApple
 import com.giochiclassici.arcade.games.snake.drawSnake
 import com.giochiclassici.arcade.games.pong.drawPongPreview
 import com.giochiclassici.arcade.games.tris.drawTrisPreview
+import com.giochiclassici.arcade.games.rigori.RigoriMode
+import com.giochiclassici.arcade.games.rigori.drawRigoriPreview
+import com.giochiclassici.arcade.games.rigori.rigoriBestKey
 import com.giochiclassici.arcade.ui.IconBtn
 import com.giochiclassici.arcade.ui.Raised
 import com.giochiclassici.arcade.ui.Surface3D
@@ -106,6 +109,7 @@ enum class GameId(val title: String, val tagline: String, val color: Color) {
     PONG("PONG", "Il duello originale · 1v1 o 1vCPU", Neon.Teal),
     SUDOKU("SUDOKU", "Nove numeri, una sola soluzione", Neon.Yellow),
     TRIS("TRIS", "Tre in fila · 1v1 o 1vCPU", Neon.Purple),
+    RIGORI("RIGORI", "Tira o para dal dischetto", Neon.Red),
 }
 
 @Composable
@@ -146,6 +150,9 @@ fun MenuScreen(onPlay: (GameId) -> Unit, onSettings: () -> Unit) {
                     val record = when (g) {
                         GameId.PONG -> "1v1 locale · 3 difficoltà CPU"
                         GameId.TRIS -> "1v1 locale · 3 difficoltà CPU"
+                        GameId.RIGORI -> listOf(RigoriMode.SHOOT to "gol", RigoriMode.SAVE to "parate").mapNotNull { (m, what) ->
+                            prefs.best(rigoriBestKey(m)).takeIf { it > 0 }?.let { "Record: $it $what" }
+                        }.joinToString(" · ").ifEmpty { null }
                         GameId.SNAKE -> prefs.best("best_snake").takeIf { it > 0 }?.let { "Record: $it" }
                         GameId.BREAKOUT -> prefs.best("best_breakout").takeIf { it > 0 }?.let { "Record: $it" }
                         GameId.INVADERS -> prefs.best("best_invaders").takeIf { it > 0 }?.let { "Record: $it" }
@@ -298,6 +305,7 @@ private fun GamePreview(game: GameId) {
         when (game) {
             GameId.PONG -> drawPongPreview(t)
             GameId.TRIS -> drawTrisPreview(t)
+            GameId.RIGORI -> drawRigoriPreview(t)
             GameId.SUDOKU -> {
                 // Griglia 3×3 che si riempie una casella alla volta.
                 val c = size.width / 3f
