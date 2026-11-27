@@ -216,13 +216,13 @@ private fun SidePanel(game: BlocksGame, best: Int, width: Dp, height: Dp) {
             }
         }
         Spacer(Modifier.height(14.dp))
-        // Il record da battere, quello di inizio partita: solo se ce n'è uno.
-        if (best > 0) StatBox("Record", best.toString(), Neon.Yellow)
-        Spacer(Modifier.weight(1f))
-        // In basso, a portata di pollice
+        // In alto, lontano dal fondo dove il pollice tocca per ruotare: così non si preme per errore
         DropButton(Modifier.width(width)) {
             if (game.phase == BlPhase.READY) game.start() else game.hardDrop()
         }
+        Spacer(Modifier.height(14.dp))
+        // Il record da battere, quello di inizio partita: solo se ce n'è uno.
+        if (best > 0) StatBox("Record", best.toString(), Neon.Yellow)
     }
 }
 
